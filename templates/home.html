@@ -18,7 +18,14 @@
 
   <a class="btn" href="{{ url_for('new_note') }}">+ New note</a>
 
-  <h2 style="margin-top: 2rem;">Your notes ({{ notes|length }})</h2>
+  <form method="GET" action="{{ url_for('home') }}" style="margin-top: 1rem;">
+    <input name="q" type="search" placeholder="Search notes…" value="{{ q or '' }}"
+           style="padding: 0.4rem 0.75rem; border: 1px solid #ccc; border-radius: 6px; font: inherit; width: 60%;">
+    <button type="submit" style="padding: 0.4rem 0.75rem; margin-left: 0.25rem; border-radius: 6px; border: 1px solid #ccc; cursor: pointer;">Search</button>
+    {% if q %}<a href="{{ url_for('home') }}" style="margin-left: 0.5rem; color: #666;">✕ Clear</a>{% endif %}
+  </form>
+
+  <h2 style="margin-top: 1.25rem;">Your notes ({{ notes|length }})</h2>
   {% if notes %}
     {% for note in notes %}
       <div class="note">
