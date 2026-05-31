@@ -28,11 +28,11 @@
     <a href="{{ url_for('home', filter='starred') }}" class="{{ 'active' if show_starred else '' }}">⭐ Starred</a>
   </div>
 
-  <h2 style="margin-top: 1rem;">Your notes ({{ notes|length }})</h2>
-  {% if notes %}
-    {% for note in notes %}
+  <h2 style="margin-top: 1rem;">Your notes ({{ indexed_notes|length }})</h2>
+  {% if indexed_notes %}
+    {% for idx, note in indexed_notes %}
       <div class="note">
-        <form method="POST" action="{{ url_for('toggle_star', idx=loop.index0) }}">
+        <form method="POST" action="{{ url_for('toggle_star', idx=idx) }}">
           <button class="star-btn" type="submit" title="Toggle star">{{ '⭐' if note.get('starred') else '☆' }}</button>
         </form>
         <div class="note-content">

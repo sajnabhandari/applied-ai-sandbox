@@ -19,8 +19,13 @@ def create_app() -> Flask:
     @app.route("/")
     def home():
         starred_only = request.args.get("filter") == "starred"
-        notes = [n for n in app.notes if n.get("starred", False)] if starred_only else app.notes
-        return render_template("home.html", notes=notes, show_starred=starred_only)
+        # Pass (original_index, note) so the toggle form always uses the real app.notes index,
+        # even when the list is filtered down to starred-only.
+        indexed_notes = [
+            (i, n) for i, n in enumerate(app.notes)
+            if not starred_only or n.get("starred", False)
+        ]
+        return render_template("home.html", indexed_notes=indexed_notes, show_starred=starred_only)
 
     @app.route("/notes/new", methods=["GET", "POST"])
     def new_note():
