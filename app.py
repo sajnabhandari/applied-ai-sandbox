@@ -18,7 +18,9 @@ def create_app() -> Flask:
 
     @app.route("/")
     def home():
-        return render_template("home.html", notes=app.notes)
+        show_starred = request.args.get("filter") == "starred"
+        notes = [n for n in app.notes if n.get("starred", False)] if show_starred else app.notes
+        return render_template("home.html", notes=notes, show_starred=show_starred)
 
     @app.route("/notes/new", methods=["GET", "POST"])
     def new_note():
@@ -26,9 +28,16 @@ def create_app() -> Flask:
             title = (request.form.get("title") or "").strip()
             body = (request.form.get("body") or "").strip()
             # TASK 01 will add validation here.
-            app.notes.append({"title": title, "body": body})
+            app.notes.append({"title": title, "body": body, "starred": False})
             return redirect(url_for("home"))
         return render_template("new_note.html")
+
+    @app.route("/notes/<int:idx>/star", methods=["POST"])
+    def toggle_star(idx: int):
+        """Toggle the starred state of a note by index."""
+        if 0 <= idx < len(app.notes):
+            app.notes[idx]["starred"] = not app.notes[idx].get("starred", False)
+        return redirect(url_for("home"))
 
     # TASK 02 will add a /notes/<idx>/delete route here.
 

@@ -7,9 +7,14 @@
     body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
     h1 { margin-bottom: 0.25rem; }
     .meta { color: #666; margin-bottom: 1.5rem; }
-    .note { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+    .note { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; display: flex; align-items: flex-start; gap: 0.75rem; }
+    .note-content { flex: 1; }
     .note h3 { margin: 0 0 0.5rem; }
     a.btn { display: inline-block; background: #1a2540; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; }
+    .filters { margin: 1rem 0; display: flex; gap: 0.5rem; }
+    .filters a { padding: 0.3rem 0.75rem; border-radius: 4px; border: 1px solid #ccc; text-decoration: none; color: #333; font-size: 0.9rem; }
+    .filters a.active { background: #1a2540; color: #fff; border-color: #1a2540; }
+    .star-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0; line-height: 1; }
   </style>
 </head>
 <body>
@@ -18,12 +23,22 @@
 
   <a class="btn" href="{{ url_for('new_note') }}">+ New note</a>
 
-  <h2 style="margin-top: 2rem;">Your notes ({{ notes|length }})</h2>
+  <div class="filters">
+    <a href="{{ url_for('home') }}" class="{{ 'active' if not show_starred else '' }}">All</a>
+    <a href="{{ url_for('home', filter='starred') }}" class="{{ 'active' if show_starred else '' }}">⭐ Starred</a>
+  </div>
+
+  <h2 style="margin-top: 1rem;">Your notes ({{ notes|length }})</h2>
   {% if notes %}
     {% for note in notes %}
       <div class="note">
-        <h3>{{ note.title }}</h3>
-        <p>{{ note.body }}</p>
+        <form method="POST" action="{{ url_for('toggle_star', idx=loop.index0) }}">
+          <button class="star-btn" type="submit" title="Toggle star">{{ '⭐' if note.get('starred') else '☆' }}</button>
+        </form>
+        <div class="note-content">
+          <h3>{{ note.title }}</h3>
+          <p>{{ note.body }}</p>
+        </div>
       </div>
     {% endfor %}
   {% else %}
