@@ -18,9 +18,9 @@ def create_app() -> Flask:
 
     @app.route("/")
     def home():
-        show_starred = request.args.get("filter") == "starred"
-        notes = [n for n in app.notes if n.get("starred", False)] if show_starred else app.notes
-        return render_template("home.html", notes=notes, show_starred=show_starred)
+        starred_only = request.args.get("filter") == "starred"
+        notes = [n for n in app.notes if n.get("starred", False)] if starred_only else app.notes
+        return render_template("home.html", notes=notes, show_starred=starred_only)
 
     @app.route("/notes/new", methods=["GET", "POST"])
     def new_note():
@@ -34,7 +34,12 @@ def create_app() -> Flask:
 
     @app.route("/notes/<int:idx>/star", methods=["POST"])
     def toggle_star(idx: int):
-        """Toggle the starred state of a note by index."""
+        """Toggle the starred state of note at position idx.
+
+        Silently ignores out-of-range indices. Uses .get() so notes created
+        before this feature was added (missing the 'starred' key) are treated
+        as unstarred rather than raising a KeyError.
+        """
         if 0 <= idx < len(app.notes):
             app.notes[idx]["starred"] = not app.notes[idx].get("starred", False)
         return redirect(url_for("home"))
