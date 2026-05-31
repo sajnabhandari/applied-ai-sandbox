@@ -8,6 +8,10 @@ from __future__ import annotations
 from flask import Flask, render_template, request, redirect, url_for
 
 
+def parse_tags(tag_str: str) -> list[str]:
+    return [t.strip() for t in tag_str.split(",") if t.strip()]
+
+
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "sandbox-not-a-real-secret"
@@ -29,7 +33,8 @@ def create_app() -> Flask:
                 return render_template("new_note.html", error="Title is required", title=title, body=body)
             if not body:
                 return render_template("new_note.html", error="Body is required", title=title, body=body)
-            app.notes.append({"title": title, "body": body, "tags": []})
+            tags = parse_tags(request.form.get("tags", ""))
+            app.notes.append({"title": title, "body": body, "tags": tags})
             return redirect(url_for("home"))
         return render_template("new_note.html")
 
